@@ -8,26 +8,28 @@
 
 <h2>All users</h2>
 
-<!--<table>-->
-<!--    <tr>-->
-<!--        <th>id</th>-->
-<!--        <th>name</th>-->
-<!--        <th>mail</th>-->
-<!--        <th>age</th>-->
-<!--    </tr>-->
 
-<!--</table>-->
+
+
 
 <div th:each="user : ${users}">
+<table>
     <a th:href="@{/users/{id}(id=${user.getId()})}" th:text="${user.getId()+ ')  ' + user.getName()}">user</a>
-    <a th:href="@{/users/{id}/edit(id=${user.getId()})}">Edit</a>
-    <form th:method="DELETE" th:action="@{/users/{id}(id=${user.getId()})}">
+    <form th:method="Edit" th:action="@{/users/{id}/edit(id=${user.getId()})}">
+        <input type="submit" value="Edit">
+    </form>
+    <form th:method="Delete" th:action="@{/users/{id}(id=${user.getId()})}">
         <input type="submit" value="Delete"/>
     </form>
+</table>
+    <br>
 </div>
 
 <br>
 <hr>
-<a href="/users/new">Create new user</a>
+
+<form th:method="Create" th:action="@{/users/new}">
+    <input type="submit" value="Create">
+</form>
 </body>
 </html>
