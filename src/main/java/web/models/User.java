@@ -1,48 +1,73 @@
 package web.models;
 
+
+import org.hibernate.annotations.Proxy;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
 
 @Entity
-@Table(name="users")
-public class User {
-
+@Table(name = "users")
+@Proxy(lazy = false)
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    @NotEmpty(message = "name should not be empty")
-    @Size(min = 2, max = 20, message = "Name should be between 2 and 20 characters")
+    @Column(name = "id")
+    private Long id;
     @Column(name = "name")
     private String name;
-
-    @Min(value = 0, message = "Age should be greater than 0")
+    @Column(name = "lastName")
+    private String lastName;
+    @Column(name = "password")
+    private String password;
     @Column(name = "age")
-    private Integer age;
-
-    @Email
-    @NotEmpty(message = "Email should not be empty")
-    @Column(name="mail")
-    private String mail;
+    private int age;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Role> roles = new HashSet<>();
 
 
-    public User(){}
+    public Set<Role> getRoles() {
+        return this.roles;
+    }
 
-    public User(Integer id, String name, String mail, Integer age) {
-        this.id = id;
+
+    // private  Set<GrantedAuthority> authorities;
+
+
+   public User(String name, String lastName, String password, int age, Set<Role> roles) {
         this.name = name;
-        this.mail = mail;
+        this.lastName = lastName;
+        this.password = password;
+        this.age = age;
+        this.roles = roles;
+
+    }
+
+
+    public User() {
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public User(String name, String password, int age) {
+        this.name = name;
+        this.password = password;
         this.age = age;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -54,19 +79,76 @@ public class User {
         this.name = name;
     }
 
-    public String getMail() {
-        return mail;
+    public String getPassword() {
+        return password;
     }
 
-    public void setMail(String mail) {
-        this.mail = mail;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public Integer getAge() {
+    public int getAge() {
         return age;
     }
 
-    public void setAge(Integer age) {
+    public void setAge(int age) {
         this.age = age;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return getAge() == user.getAge() &&
+                getId().equals(user.getId()) &&
+                getName().equals(user.getName()) &&
+                lastName.equals(user.lastName) &&
+                getPassword().equals(user.getPassword()) &&
+                getRoles().equals(user.getRoles());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), lastName, getPassword(), getAge(), getRoles());
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles;
+    }
+
+
+    @Override
+    public String getUsername() {
+        return getName();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    public String getlastName() {
+        return lastName;
+    }
+
+    public void setlastName(String lastName) {
+        this.lastName = lastName;
     }
 }
